@@ -1,5 +1,5 @@
 # Rusty Heliostat
-An under construction dual-axis heliostat controller written in Rust, running on an Arduino Nano ESP32 (ESP32-S3) via ESP-IDF. Aiming to open source the project, including software and hardware levels. 
+An under construction dual-axis heliostat controller written in Rust, running on an Arduino Nano ESP32 (ESP32-S3) via ESP-IDF. Aiming to keep the project open source for hardware and software layers. 
 
 The heliostat will track the sun and angle a mirror to reflect sunlight at a fixed target point — useful for redirecting natural light indoors. Hoping I can set this up to rotate to a few fixed spots throughout the course of the day. I have some plants inside that sorely need the light. 
 
