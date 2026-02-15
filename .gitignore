@@ -1,0 +1,5 @@
+# Rust / ESP-IDF build artifacts
+firmware/.vscode
+firmware/.embuild
+firmware/target
+firmware/Cargo.lock
