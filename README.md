@@ -1,8 +1,7 @@
 # Rusty Heliostat
+An under construction dual-axis heliostat controller written in Rust, running on an Arduino Nano ESP32 (ESP32-S3) via ESP-IDF. Aiming to open source the project, including software and hardware levels. 
 
-A dual-axis heliostat controller written in Rust, running on an Arduino Nano ESP32 (ESP32-S3) via ESP-IDF.
-
-The heliostat tracks the sun and angles a mirror to reflect sunlight at a fixed target point — useful for redirecting natural light indoors.
+The heliostat will track the sun and angle a mirror to reflect sunlight at a fixed target point — useful for redirecting natural light indoors. Hoping I can set this up to rotate to a few fixed spots throughout the course of the day. I have some plants inside that sorely need the light. 
 
 ## Hardware
 
@@ -12,15 +11,7 @@ The heliostat tracks the sun and angles a mirror to reflect sunlight at a fixed 
 - **RTC**: DS3231 (I2C)
 - **Power**: 12V 5A supply
 
-See [docs/electric-equipment.md](docs/electric-equipment.md) for full specs and [docs/heliostat_project_summary_1.md](docs/heliostat_project_summary_1.md) for the overall project design.
-
-## Firmware Features
-
-- WiFi connectivity (WPA2)
-- HTTP status endpoint (`GET /`)
-- OTA firmware updates (`POST /flash`)
-- OTA rollback protection
-- Heartbeat LED on GPIO 48
+See [docs/electric-equipment.md](docs/electric-equipment.md) for full specs.
 
 ## Getting Started
 
@@ -55,21 +46,3 @@ cd firmware
 WIFI_SSID=<ssid> WIFI_PASSWORD=<password> ./deploy.sh <device-ip>
 ```
 
-## Project Structure
-
-```
-rusty-heliostat/
-├── firmware/
-│   ├── src/main.rs           # Application entry point
-│   ├── Cargo.toml            # Dependencies (esp-idf-svc, anyhow, log)
-│   ├── sdkconfig.defaults    # ESP-IDF config (8 MB flash, USB JTAG console, OTA)
-│   ├── partitions.csv        # Dual OTA partition layout
-│   ├── deploy.sh             # OTA deploy script
-│   ├── .cargo/config.toml    # Build target, runner, espflash flags
-│   └── rust-toolchain.toml   # Xtensa toolchain pinning
-└── docs/
-    ├── first-flash-guide.md          # One-time Arduino-to-ESP-IDF flashing guide
-    ├── setup-arduino.md              # WSL2 USB forwarding & arduino-cli setup
-    ├── electric-equipment.md         # Hardware inventory & wiring
-    └── heliostat_project_summary_1.md # Project design & architecture
-```
