@@ -1,5 +1,21 @@
 # Arduino Nano ESP32 Setup Plan
 
+## Breadboard Wiring Diagram
+
+A visual wiring diagram is available as a Wokwi project file:
+[`breadboard-wiring.json`](breadboard-wiring.json)
+
+**To view it:**
+1. Go to [wokwi.com](https://wokwi.com) and create a new project (any board)
+2. Switch to the diagram editor tab and replace the `diagram.json` contents with the contents of `breadboard-wiring.json`
+3. The breadboard layout will render with all components and color-coded wires
+
+**What's included:** Arduino Nano ESP32, 2x A4988 stepper drivers (stand-in for TMC2209 — same STEP/DIR/ENABLE interface), 2x NEMA 17 stepper motors, and a half-size breadboard for power distribution.
+
+**Not included (no Wokwi parts available):** DS3231 RTC (E-06, connects via I2C on A4/A5) and 12V 5A PSU (E-08, connects to driver VMOT pins and Nano VIN). See the wiring diagram in [`heliostat_project_summary_1.md`](heliostat_project_summary_1.md) for the complete picture.
+
+---
+
 ## Goal
 Establish a working dev connection from WSL2 to the Arduino Nano ESP32 (E-03) over USB.
 

@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "author": "rusty-heliostat",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-arduino-nano-esp32",
+      "id": "nano",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-breadboard-half",
+      "id": "bb1",
+      "top": 280,
+      "left": -40,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-a4988",
+      "id": "az-drv",
+      "top": 0,
+      "left": 380,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-a4988",
+      "id": "el-drv",
+      "top": 0,
+      "left": 580,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-stepper-motor",
+      "id": "az-motor",
+      "top": -220,
+      "left": 320,
+      "attrs": { "display": "angle" }
+    },
+    {
+      "type": "wokwi-stepper-motor",
+      "id": "el-motor",
+      "top": -220,
+      "left": 520,
+      "attrs": { "display": "angle" }
+    }
+  ],
+  "connections": [
+    ["nano:D2", "az-drv:STEP", "green", []],
+    ["nano:D3", "az-drv:DIR", "blue", []],
+    ["nano:D4", "el-drv:STEP", "green", []],
+    ["nano:D5", "el-drv:DIR", "blue", []],
+
+    ["nano:GND.1", "bb1:tn.1", "black", []],
+    ["bb1:tn.5", "az-drv:GND", "black", []],
+    ["bb1:tn.10", "el-drv:GND", "black", []],
+
+    ["nano:5V", "bb1:tp.1", "red", []],
+    ["bb1:tp.5", "az-drv:VDD", "red", []],
+    ["bb1:tp.10", "el-drv:VDD", "red", []],
+
+    ["az-drv:RESET", "az-drv:SLEEP", "gray", []],
+    ["el-drv:RESET", "el-drv:SLEEP", "gray", []],
+
+    ["az-drv:1A", "az-motor:A+", "orange", []],
+    ["az-drv:1B", "az-motor:A-", "orange", []],
+    ["az-drv:2A", "az-motor:B+", "yellow", []],
+    ["az-drv:2B", "az-motor:B-", "yellow", []],
+
+    ["el-drv:1A", "el-motor:A+", "orange", []],
+    ["el-drv:1B", "el-motor:A-", "orange", []],
+    ["el-drv:2A", "el-motor:B+", "yellow", []],
+    ["el-drv:2B", "el-motor:B-", "yellow", []]
+  ],
+  "dependencies": {}
+}
