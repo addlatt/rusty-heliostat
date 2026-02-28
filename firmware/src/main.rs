@@ -1,4 +1,5 @@
 use anyhow::Result;
+use chrono::{DateTime, Utc};
 use esp_idf_svc::{
     eventloop::EspSystemEventLoop,
     hal::{
@@ -10,13 +11,17 @@ use esp_idf_svc::{
     io::Write,
     nvs::EspDefaultNvsPartition,
     ota::EspOta,
+    sntp::EspSntp,
     wifi::{AuthMethod, BlockingWifi, ClientConfiguration, Configuration, EspWifi},
 };
 use log::{info, warn};
+use solar_positioning::grena3;
 use std::sync::Mutex;
 
 const WIFI_SSID: &str = env!("WIFI_SSID");
 const WIFI_PASSWORD: &str = env!("WIFI_PASSWORD");
+const HELIOSTAT_LAT: &str = env!("HELIOSTAT_LAT");
+const HELIOSTAT_LON: &str = env!("HELIOSTAT_LON");
 
 fn main() -> Result<()> {
     esp_idf_svc::sys::link_patches();
@@ -40,6 +45,21 @@ fn main() -> Result<()> {
 
     let ip = wifi.wifi().sta_netif().get_ip_info()?.ip;
     info!("WiFi connected! IP: {}", ip);
+
+    // Sync time via NTP (handle stays in scope to keep service running)
+    let _sntp = EspSntp::new_default()?;
+    info!("SNTP initialised, waiting for time sync...");
+    FreeRtos::delay_ms(3000);
+    info!("Time sync done (assuming success)");
+
+    // Parse location from env vars
+    let lat: f64 = HELIOSTAT_LAT
+        .parse()
+        .expect("HELIOSTAT_LAT must be a valid f64");
+    let lon: f64 = HELIOSTAT_LON
+        .parse()
+        .expect("HELIOSTAT_LON must be a valid f64");
+    info!("Heliostat location: lat={}, lon={}", lat, lon);
 
     // Mark current OTA slot as valid (rollback protection)
     {
@@ -113,10 +133,24 @@ fn main() -> Result<()> {
 
     info!("HTTP server running on http://{}:80/", ip);
 
-    // Heartbeat blink loop
+    // Heartbeat blink loop — also logs sun position every ~60 s
+    let mut tick: u32 = 0;
     loop {
         led.toggle()?;
         FreeRtos::delay_ms(1000);
+        tick += 1;
+
+        if tick % 60 == 0 {
+            let now: DateTime<Utc> = std::time::SystemTime::now().into();
+            match grena3::solar_position(now, lat, lon, 69.0, None) {
+                Ok(pos) => info!(
+                    "Sun — azimuth: {:.1}°, elevation: {:.1}°",
+                    pos.azimuth(),
+                    pos.elevation_angle()
+                ),
+                Err(e) => warn!("Solar position error: {}", e),
+            }
+        }
     }
 }
 

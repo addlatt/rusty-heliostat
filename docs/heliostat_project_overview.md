@@ -11,7 +11,6 @@ Building a dual-axis heliostat — a mirror that tracks the sun and reflects sun
 
 **Primary use case:** Reflecting sunlight indoors for natural lighting
 
-**User background:** Software engineer experienced with TypeScript, React, PostgreSQL, Python. New to small electronics/embedded systems. Interested in using Rust on ESP32 if feasible.
 
 ---
 
@@ -76,7 +75,7 @@ Building a dual-axis heliostat — a mirror that tracks the sun and reflects sun
 | E-11 | 100µF 25V decoupling capacitors | On Order |
 | | **Total Electronics: ~$155** | |
 
-### Mechanical Bill of Materials
+### Mechanical Bill of Materials - proposed, to be updated with final parts
 
 | Component | Qty | Purpose | Est. Cost |
 |-----------|-----|---------|-----------|
@@ -89,7 +88,6 @@ Building a dual-axis heliostat — a mirror that tracks the sun and reflects sun
 | Acrylic Mirror 12"×12" | 1 | Reflector | $15 |
 | Plywood backing 12"×12" | 1 | Mirror support | $5 |
 | Counterweight | 1 | Balance | $5-10 |
-| **Total Mechanical** | | | **~$100** |
 
 ---
 
@@ -148,25 +146,8 @@ Building a dual-axis heliostat — a mirror that tracks the sun and reflects sun
 
 ## Software Architecture
 
-### Option A: Arduino/C++ (Fastest to working)
 
-```
-Arduino Framework
-├── Libraries
-│   ├── AccelStepper (motor control)
-│   ├── RTClib (DS3231 interface)
-│   ├── SolarPosition (sun calculations)
-│   └── WiFi (configuration portal)
-└── Main Loop
-    1. Get current time from RTC
-    2. Calculate sun position (azimuth, elevation)
-    3. Calculate mirror angle (bisector of sun→mirror→target)
-    4. Move motors to target position
-    5. Sleep/delay
-    6. Repeat
-```
-
-### Option B: Rust on ESP32 (User preference)
+### Rust on ESP32
 
 ```
 esp-rs ecosystem
@@ -174,17 +155,15 @@ esp-rs ecosystem
 ├── esp-idf-svc (WiFi, NTP)
 ├── embedded-hal (hardware abstraction)
 └── Custom code
-    ├── Solar position algorithm (port NREL SPA or write)
+    ├── Solar position algorithm (Grena3 via solar-positioning crate)
     ├── Stepper control (write from scratch)
     └── RTC interface (ds323x crate exists)
 ```
 
-**Rust feasibility:** Yes, ESP32 has good Rust support via esp-rs project. User would need to:
-- Port or write solar position algorithm
+ESP32 has good Rust support via esp-rs project. User would need to:
+- Using Grena3 algorithm via `solar-positioning` crate v0.3**
 - Write stepper control logic (no AccelStepper equivalent)
-- Use existing ds323x crate for RTC
-
-**Recommendation:** Prototype with Arduino/C++ first to verify hardware, then port to Rust.
+- Use existing ds323x crate for RTC?
 
 ---
 
@@ -215,11 +194,11 @@ A heliostat must position the mirror so it reflects sunlight to a fixed target. 
 ```
 1. INPUT:
    - Current time (from RTC)
-   - Location (latitude, longitude) — hardcoded or from GPS
+   - Location (latitude, longitude) — via env vars - possible future automation
    - Target position (azimuth, elevation relative to mirror)
 
 2. CALCULATE SUN POSITION:
-   - Use NREL SPA algorithm or simplified equations
+   - Usinig grena3
    - Output: sun_azimuth, sun_elevation (in degrees)
 
 3. CONVERT TO VECTORS:
@@ -237,63 +216,6 @@ A heliostat must position the mirror so it reflects sunlight to a fixed target. 
    - Send step pulses to drivers
 ```
 
-### Simplified Solar Position (for reference)
-
-The NREL SPA algorithm is complex (~300 lines of C). A simplified version good to ~1° accuracy:
-
-```
-// Approximate sun position
-function getSunPosition(lat, lon, time):
-    // Day of year (1-365)
-    N = dayOfYear(time)
-    
-    // Solar declination
-    declination = -23.45 * cos(360/365 * (N + 10))
-    
-    // Hour angle (15° per hour from solar noon)
-    solarNoon = 12:00 - (lon / 15)  // Adjust for longitude
-    hourAngle = 15 * (hour - solarNoon)
-    
-    // Elevation angle
-    elevation = asin(sin(lat) * sin(declination) + 
-                     cos(lat) * cos(declination) * cos(hourAngle))
-    
-    // Azimuth angle
-    azimuth = atan2(-sin(hourAngle),
-                    tan(declination) * cos(lat) - sin(lat) * cos(hourAngle))
-    
-    return (azimuth, elevation)
-```
-
----
-
-## User's Open Questions
-
-1. **Rust priority:** User wants Rust if feasible. Confirmed it works on ESP32 via esp-rs, but requires more DIY for motor control and solar algorithms.
-
-2. **Electronics experience:** User is new to small electronics. Provided explanations of:
-   - ESP32 (microcontroller)
-   - TMC2209 (stepper driver)
-   - Stepper motors (how they work)
-   - DS3231 (RTC)
-   - Power distribution
-   - Signal types (digital, I2C, motor power)
-
----
-
-## Next Steps
-
-1. **Solder headers on Arduino Nano ESP32** (E-03) — required before breadboard use
-2. **Receive decoupling capacitors** (E-11) — on order
-3. **Breadboard wiring** — connect E-03, E-04, E-05, E-06 per pin assignments above
-4. **Test motors** — verify basic STEP/DIR operation with E-01 and E-02
-5. **Write firmware** — start with Arduino/C++ or Rust
-6. **Design frame in CAD** — finalize dimensions based on actual motor size (42mm × 42mm × 48mm)
-7. **Build frame** — cut aluminum, assemble
-8. **Integrate and calibrate** — mount motors, align mirror, tune algorithm
-
----
-
 ## Files in This Directory
 
 - `electric-equipment.md` — Canonical electrical parts inventory (E-01 through E-11) with full specs, wiring, and budget
@@ -303,6 +225,7 @@ function getSunPosition(lat, lon, time):
 ## Reference Links
 
 - ESP32 Rust: https://github.com/esp-rs
-- NREL SPA Algorithm: https://midcdmz.nrel.gov/spa/
+- Grena3 Solar Position Algorithm (selected): https://docs.rs/solar-positioning/
+- NREL SPA Algorithm (considered, not used): https://midcdmz.nrel.gov/spa/
 - TMC2209 Datasheet: https://www.trinamic.com/products/integrated-circuits/details/tmc2209-la/
 - StepperOnline (motors): https://www.omc-stepperonline.com/

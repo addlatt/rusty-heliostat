@@ -16,4 +16,6 @@ ESP_IDF_VERSION = "v5.3.3"
 # Copy partitions.csv into the esp-idf-sys cmake build output directory
 ESP_IDF_GLOB_PARTS_BASE = { value = ".", relative = true }
 ESP_IDF_GLOB_PARTS_CSV = "partitions.csv"
+HELIOSTAT_LAT = "39.12617"
+HELIOSTAT_LON = "-84.46996"
 

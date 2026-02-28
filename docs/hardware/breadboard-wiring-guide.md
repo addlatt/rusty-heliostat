@@ -903,13 +903,12 @@ I2C uses just 2 wires (plus power and ground):
 ---
 
 #### Step 5.4 — Verify RTC Wiring
-Ended here 2/22/26. Begin here on next session.
 
 Checklist:
-- [ ] RTC VCC → 3.3V rail (top +) — **red wire**
-- [ ] RTC GND → GND rail (top -) — **black wire**
-- [ ] Arduino A4 → RTC SDA — **yellow wire**
-- [ ] Arduino A5 → RTC SCL — **yellow wire**
+- [x ] RTC VCC → 3.3V rail (top +) — **red wire**
+- [x ] RTC GND → GND rail (top -) — **black wire**
+- [x ] Arduino A4 → RTC SDA — **yellow wire**
+- [x ] Arduino A5 → RTC SCL — **yellow wire**
 
 ---
 
